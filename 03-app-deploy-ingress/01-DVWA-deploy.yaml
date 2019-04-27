@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dvwa-app
+  labels:
+    name: dvwa-app 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dvwa-app # Name of Webserver Kubernetes service 
+                 #- for routing and DNS
+  namespace: dvwa-app
+spec:
+  ports:
+  - port: 80 # Port of pod
+  selector:
+    app: dvwa-app
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dvwa-app
+  namespace: dvwa-app
+spec:
+  selector:
+    matchLabels:
+      app: dvwa-app
+  serviceName: 'dvwa-app'
+  replicas: 2 # Replicate to 2 pods for High Availability
+  template:
+    metadata:
+      labels:
+        app: dvwa-app
+    spec:
+      containers:
+      - name: vulnerables
+        image: vulnerables/web-dvwa
+        ports:
+        - containerPort: 80

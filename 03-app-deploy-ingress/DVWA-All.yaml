@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dvwa-app # Name of Webserver Kubernetes service 
+                 #- for routing and DNS
+  namespace: dvwa-app
+spec:
+  ports:
+  - port: 8000 # Port of pod
+  selector:
+    app: dvwa-app
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dvwa-app
+  namespace: dvwa-app
+spec:
+  selector:
+    matchLabels:
+      app: dvwa-app
+  serviceName: 'dvwa-app'
+  replicas: 2 # Replicate to 2 pods for High Availability
+  template:
+    metadata:
+      labels:
+        app: dvwa-app
+    spec:
+      containers:
+      - name: appsecco
+        image: appsecco/dsvw
+        ports:
+        - containerPort: 8000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dvwa-https-waf
+  namespace: dvwa-app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Force redirect HTTPS
+    nginx.ingress.kubernetes.io/rewrite-target: / 
+    nginx.ingress.kubernetes.io/lua-resty-waf: "active" # Turn on WAF
+    nginx.ingress.kubernetes.io/lua-resty-waf-score-threshold: "10"    
+spec:
+  tls:
+  - hosts: # Replace your domains in here
+    - ducltm-azurebootcamp.southeastasia.cloudapp.azure.com    
+    secretName: tls-secret
+  rules:
+  - host: ducltm-azurebootcamp.southeastasia.cloudapp.azure.com # Replace your domain in here
+    http:
+      paths:
+      - path: /
+        backend:          
+          serviceName: dvwa-app # Replace your service name
+          servicePort: 8000 # Replace your service port
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ip-cluster-routing
+  namespace: dvwa-app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/lua-resty-waf: "active"
+    nginx.ingress.kubernetes.io/lua-resty-waf-debug: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:          
+          serviceName: dvwa-app
+          servicePort: 8000

@@ -1,0 +1,16 @@
+let startTimestamp = ago(30d);
+ContainerLog
+  | where TimeGenerated > startTimestamp
+  | where LogEntry has "lua"
+  | project LogEntry, TimeGenerated
+  | parse LogEntry with * "log.lua:52:" JSONLog "while" *
+  | extend ResultLogObject = parse_json(JSONLog) 
+  | project ResultLogObject, TimeGenerated
+  | extend   
+  Method = tostring(ResultLogObject.method), 
+  URI = tostring(ResultLogObject.uri),
+  Client = tostring(ResultLogObject.client),
+  Alert1 = tostring(ResultLogObject.alerts[0].msg),
+  Alert2 = tostring(ResultLogObject.alerts[1].msg),
+  Alert3 = tostring(ResultLogObject.alerts[2].msg)
+  | project TimeGenerated, URI, Method, Client, Alert1, Alert2, Alert3 
